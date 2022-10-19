@@ -1,0 +1,51 @@
+name: release-edge
+
+on:
+  push:
+    tags:
+      - edge-v*.*.*
+  pull_request:
+jobs:
+  release-edge:
+    defaults:
+      run:
+        working-directory: ./rabbitmq
+    strategy:
+      matrix:
+        go-version: [ 1.16.x ]
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - run: |
+          export VERSION=$((git describe --tags --dirty --match='edge-v*' 2>/dev/null || echo v0.0.0) | cut -c1- )
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "TAG=${VERSION}" >> $GITHUB_ENV
+
+      - uses: actions/cache@v2
+        env:
+          cache-name: golang
+        with:
+          path: /go/pkg/mod
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - name: Setup QUEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Setup buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build docker container
+        run:  |
+          echo "${{ secrets.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          make -j3 release

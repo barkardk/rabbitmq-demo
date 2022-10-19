@@ -1,0 +1,13 @@
+theme: jekyll-theme-minimal
+title: Integration
+description: Small fast clients to run integration tests on various installations
+logo: img/spider.jpg
+show_downloads: true
+lsi: false
+safe: true
+source: /
+incremental: false
+highlighter: rouge
+gist:
+  noscript: false
+markdown: gfm
