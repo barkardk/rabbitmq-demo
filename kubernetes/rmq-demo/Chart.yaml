@@ -1,0 +1,11 @@
+apiVersion: v2
+name: rmq-demo
+description: Demo application to demostrate using vault as a secret manager
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+dependencies:
+  - condition: rabbitmq.enabled
+    name: rabbitmq
+    repository: https://charts.bitnami.com/bitnami
+    version: 11.0.2

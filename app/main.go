@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
-
+	"github.com/kelseyhightower/envconfig"
+	_ "github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
@@ -18,16 +18,19 @@ type mqResources struct {
 	expectedMessageCountConsumed  int
 }
 
-func defaultConnStr() string {
-	defaultConnStr, exists := os.LookupEnv("RABBITMQ_AMQP_CONN_STR")
-	if exists {
-		return defaultConnStr
-	}
-	return "amqp://guest:guest@127.0.0.1:5672/"
+type settings struct {
+	Password string
+	Username string
+	Port     int
+	Server   string
 }
 
-func RabbitMQAMQPConnection() (*amqp.Connection, error) {
-	conn, err := amqp.Dial(defaultConnStr())
+func defaultConnStr(s *settings) string {
+	return "amqp://" + s.Username + ":" + s.Password + "@" + s.Server + ":" + string(s.Port) + "/"
+}
+
+func RabbitMQAMQPConnection(s *settings) (*amqp.Connection, error) {
+	conn, err := amqp.Dial(defaultConnStr(s))
 	if err != nil {
 		return nil, fmt.Errorf("Could not connect to rabbitMQ %s", err)
 	}
@@ -35,6 +38,11 @@ func RabbitMQAMQPConnection() (*amqp.Connection, error) {
 }
 
 func main() {
+	var s settings
+	err := envconfig.Process("secret_demo", &s)
+	if err != nil {
+		log.Fatal("failed to initialize settings ", err.Error())
+	}
 	log.Debugf("You are running buildversion %v: compiled at: %v ", Version, BuildTime)
 	qn := &mqResources{
 		queueName:                     "MQTestQueue",
@@ -43,7 +51,7 @@ func main() {
 		expectedMessageCountConsumed:  0,
 	}
 
-	conn, err := RabbitMQAMQPConnection()
+	conn, err := RabbitMQAMQPConnection(&s)
 	if err != nil {
 		log.Fatalf("Could not create RabbitMQ connection %v", err)
 	}
