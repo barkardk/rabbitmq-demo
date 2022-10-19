@@ -1,5 +1,5 @@
+<img align="right" src="img/k8s.png"  width="600px"> 
 
-![k8s](./img/k8s.jpg =250x250) 
 # Vault on kubernetes demo 
 
 A small rabbitmq application, formerly used as an E2E test to demostratoe usage of vault for password and secret management instead of kubernetes secrets 
