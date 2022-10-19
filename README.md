@@ -1,15 +1,16 @@
 
-# Integration tests
+![k8s](./img/k8s.jpg =250x250) 
+# Vault on kubernetes demo 
 
-Various integration tests that can be used on common platforms  
+A small rabbitmq application, formerly used as an E2E test to demostratoe usage of vault for password and secret management instead of kubernetes secrets 
 
 
 ### Release
 Stable versions are released via tags that published the docker images to github via actions.
-Also see [https://barkardk.github.io/integration/](https://barkardk.github.io/integration/)
+Also see [https://barkardk.github.io/rabbitmq-demo/](https://barkardk.github.io/rabbitmq-demo/)
 
-# RabbitMQ integration
-RabbitMQ integration is a small test suite to test rabbitmq server installations.  
+# RabbitMQ app 
+RabbitMQ app is a small test suite originally used to to test rabbitmq server installations.  
 It works by connecting to a rabbitmq server via a provided AMQP string, it will then create a queue , post a message and consume the message.
 
 ## Dockerfiles
