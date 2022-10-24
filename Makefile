@@ -7,18 +7,13 @@ DOCKER_REGISTRY?=ghcr.io/barkardk
 help: ## Help
 	@grep -E '^[a-zA-Z\\._-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
-docker.restart: docker.stop docker.start ## restart docker-compose
 build: fmt lint build.linux ## Run a full build with linting , depencency testing and import
-release: docker-manifest.purge publish pi manifests ## Build linux release containers
-pies: docker-manifest.purge pi manifests
-release.binary: build.linux  ## Build binaries for various linux architectures
+deploy: docker-manifest.purge publish pi manifests helm ## Build linux release containers
 
-docker.start: ## Start docker-compose
-	docker-compose up -d --remove-orphans;
-docker.stop: ## Stop docker-compose
-	docker-compose stop;
-docker.build: ## Build client docker container
-	docker build -t client .
+helm: ## Package and install helm chart
+	@echo "-> $@"
+	helm dependency build kubernetes/rmq-demo
+	helm upgrade --install rmq-demo kubernetes/rmq-demo
 
 .PHONY: clean
 clean: ## Clean compiled binaries
